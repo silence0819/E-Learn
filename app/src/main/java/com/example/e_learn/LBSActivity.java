@@ -50,30 +50,8 @@ public class LBSActivity extends AppCompatActivity implements View.OnClickListen
     int[] Random;
 
     public LocationClient mLocClient = null;
+    public BDLocationListener myListener = new MyLocationListener2();
 
-
-    /*
-    @Override
-    public void onRequestPermissionsResult(int requestCode,String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case 1:
-                if (grantResults.length > 0) {
-                    for (int result : grantResults) {
-                        if (result != PackageManager.PERMISSION_GRANTED) {
-                            Toast.makeText(this, "必须同意所有权限才能使用本程序", Toast.LENGTH_SHORT).show();
-                            finish();
-                            return;
-                        }
-                    }
-                } else {
-                    Toast.makeText(this, "发生未知错误", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-                break;
-            default:
-        }
-    }
-    */
 
     private MyLocationConfiguration myLocationConfiguration;
     private MapView mMapView = null;
@@ -82,10 +60,8 @@ public class LBSActivity extends AppCompatActivity implements View.OnClickListen
     private PercentRelativeLayout Tip;
 
 
-
-
     @Override
-    public void onRequestPermissionsResult(int requestCode,String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case 1:
                 if (grantResults.length > 0) {
@@ -104,3 +80,62 @@ public class LBSActivity extends AppCompatActivity implements View.OnClickListen
             default:
         }
     }
+
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (v.getId()) {
+            case R.id.getScene:
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    Animation anim = AnimationUtils.loadAnimation(LBSActivity.this, R.anim.up_down);
+                    getScene.startAnimation(anim);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    Animation anim = AnimationUtils.loadAnimation(LBSActivity.this, R.anim.up_down2);
+                    getScene.startAnimation(anim);
+                }
+                break;
+            case R.id.startLearn:
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    Animation anim = AnimationUtils.loadAnimation(LBSActivity.this, R.anim.up_down);
+                    StartLearn.startAnimation(anim);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    Animation anim = AnimationUtils.loadAnimation(LBSActivity.this, R.anim.up_down2);
+                    StartLearn.startAnimation(anim);
+                }
+                break;
+        }
+        return false;
+    }
+
+    public class MyLocationListener2 implements BDLocationListener {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            // map view 销毁后不在处理新接收的位置
+            if (location == null || mMapView == null)
+                return;
+            MyLocationData locData = new MyLocationData.Builder()
+                    .accuracy(location.getRadius())
+                    // 此处设置开发者获取到的方向信息，顺时针0-360
+                    .direction(location.getDirection()).latitude(location.getLatitude())
+                    .longitude(location.getLongitude()).build();
+
+
+            sb2 = location.getLocationDescribe();
+            Log.i("test", String.valueOf(sb2));
+            //30.318594 120.385722
+            //30.318387 120.385538
+
+            mBaiduMap.setMyLocationData(locData);
+            if (isFirstLoc) {
+                isFirstLoc = false;
+                LatLng ll = new LatLng(location.getLatitude(),
+                        location.getLongitude());
+                MapStatusUpdate u = MapStatusUpdateFactory.zoomTo(19f);
+                MapStatusUpdate u2 = MapStatusUpdateFactory.newLatLng(ll);
+                mBaiduMap.animateMapStatus(u);
+                mBaiduMap.animateMapStatus(u2);
+
+            }
+        }
+    }
+
+}
