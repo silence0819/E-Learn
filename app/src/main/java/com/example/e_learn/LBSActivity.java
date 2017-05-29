@@ -136,6 +136,96 @@ public class LBSActivity extends AppCompatActivity implements View.OnClickListen
 
             }
         }
+
+        public void onConnectHotSpotMessage(String s, int i) {
+        }
+
+        public void onReceivePoi(BDLocation poiLocation) {
+        }
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SDKInitializer.initialize(getApplicationContext());
+        setContentView(R.layout.lbs);
+
+        mLocClient = new LocationClient(getApplicationContext());
+        //声明LocationClient类
+
+
+
+        /*List<String> permissionList = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(LBSActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(LBSActivity.this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.READ_PHONE_STATE);
+        }
+        if (ContextCompat.checkSelfPermission(LBSActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        } else {
+
+
+        }*/
+        mMapView = (MapView) findViewById(R.id.bmapView);
+        mBaiduMap = mMapView.getMap();
+        mBaiduMap.isBuildingsEnabled();
+// 开启定位图层
+        mBaiduMap.setMyLocationEnabled(true);
+        mBaiduMap.setMaxAndMinZoomLevel(20f, 19f);
+
+        myLocationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.FOLLOWING,
+                true, null);
+        mBaiduMap.setMyLocationConfigeration(myLocationConfiguration);
+
+// 定位初始化
+        mLocClient = new LocationClient(this);
+        mLocClient.registerLocationListener(myListener);
+
+        LocationClientOption option = new LocationClientOption();
+        option.setOpenGps(true);// 打开gps
+        option.setCoorType("bd09ll"); // 设置坐标类型
+        //option.setScanSpan(1000);
+        mLocClient.setLocOption(option);
+        mLocClient.start();
+//普通地图
+        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+
+        Button Refresh = (Button) findViewById(R.id.refresh);
+        Refresh.setOnClickListener(this);
+
+        getScene = (Button) findViewById(R.id.getScene);
+        getScene.setOnClickListener(this);
+        getScene.setOnTouchListener(this);
+
+        Tip = (PercentRelativeLayout) findViewById(R.id.TipLayout);
+        Tip.getBackground().setAlpha(125);
+
+        StartLearn = (Button) findViewById(R.id.startLearn);
+        StartLearn.setOnClickListener(this);
+        StartLearn.setOnTouchListener(this);
+        StartLearn.setVisibility(View.GONE);
+
+        changeScene = (Button) findViewById(R.id.changeChose);
+        changeScene.setOnClickListener(this);
+        changeScene2 = (Button) findViewById(R.id.changeChose2);
+        changeScene2.setOnClickListener(this);
+
+        SceneChose1 = (Button) findViewById(R.id.first_button);
+        SceneChose1.setOnClickListener(this);
+        SceneChose2 = (Button) findViewById(R.id.second_button);
+        SceneChose2.setOnClickListener(this);
+        SceneChose3 = (Button) findViewById(R.id.third_button);
+        SceneChose3.setOnClickListener(this);
+        SceneChose4 = (Button) findViewById(R.id.fourth_button);
+        SceneChose4.setOnClickListener(this);
+
+    }
     }
 
 }
