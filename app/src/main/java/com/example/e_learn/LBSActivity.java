@@ -226,6 +226,178 @@ public class LBSActivity extends AppCompatActivity implements View.OnClickListen
         SceneChose4.setOnClickListener(this);
 
     }
+
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.refresh:
+                TextView text3 = (TextView) findViewById(R.id.text2);
+                text3.setText(sb2);
+                SceneChose1.setBackgroundResource(R.drawable.scenechose);
+                SceneChose2.setBackgroundResource(R.drawable.scenechose);
+                SceneChose3.setBackgroundResource(R.drawable.scenechose);
+                SceneChose4.setBackgroundResource(R.drawable.scenechose);
+                choses = 0;
+                break;
+            case R.id.getScene:
+                Log.i("test",sb2);
+                if (sb2==null) {
+                    Toast.makeText(LBSActivity.this, "获取位置信息失败。", Toast.LENGTH_SHORT).show();
+                    Log.i("MainActivity", "未执行");
+                } else {
+                    TextView text2 = (TextView) findViewById(R.id.text2);
+                    text2.setText(sb2);
+                    List<School> Scene = DataSupport.findAll(School.class);
+                    Data = new String[Scene.size()];
+                    int i=0;
+                    for (School school : Scene) {
+                        Data[i++] = school.getScene();
+                    }
+                    Random = getRandom(Scene.size(), 4);
+                    for (int j = 0; j < 4; j++) {
+                        int ls = Random[j];
+                        Log.i("Hey", Data[ls]);
+                    }
+                    int ls = Random[0];
+                    SceneChose1.setText(Data[ls]);
+                    ls = Random[1];
+                    SceneChose2.setText(Data[ls]);
+                    ls = Random[2];
+                    SceneChose3.setText(Data[ls]);
+                    ls = Random[3];
+                    SceneChose4.setText(Data[ls]);
+                    Tip.setVisibility(View.VISIBLE);
+                    getScene.setAlpha(0);
+                    StartLearn.setVisibility(View.VISIBLE);
+                    Log.i("MainActivity", "已执行");
+                }
+                break;
+            case R.id.changeChose:
+            case R.id.changeChose2:
+                List<School> Scene = DataSupport.findAll(School.class);
+                Data = new String[Scene.size()];
+                int i=0;
+                for (School school : Scene) {
+                    Data[i++] = school.getScene();
+                }
+                int Random[] = getRandom(Scene.size(), 4);
+                for (int j = 0; j < 4; j++) {
+                    int ls = Random[j];
+                    Log.i("Hey", Data[ls]);
+                }
+                int ls = Random[0];
+                SceneChose1.setText(Data[ls]);
+                ls = Random[1];
+                SceneChose2.setText(Data[ls]);
+                ls = Random[2];
+                SceneChose3.setText(Data[ls]);
+                ls = Random[3];
+                SceneChose4.setText(Data[ls]);
+                Log.i("Main", "test success");
+                SceneChose1.setBackgroundResource(R.drawable.scenechose);
+                SceneChose2.setBackgroundResource(R.drawable.scenechose);
+                SceneChose3.setBackgroundResource(R.drawable.scenechose);
+                SceneChose4.setBackgroundResource(R.drawable.scenechose);
+                choses = 0;
+                break;
+            case R.id.first_button:
+                SceneChose2.setBackgroundResource(R.drawable.scenechose);
+                SceneChose3.setBackgroundResource(R.drawable.scenechose);
+                SceneChose4.setBackgroundResource(R.drawable.scenechose);
+                SceneChose1.setBackgroundResource(R.drawable.scenechose2);
+                choses = 1;
+                break;
+            case R.id.second_button:
+                SceneChose1.setBackgroundResource(R.drawable.scenechose);
+                SceneChose3.setBackgroundResource(R.drawable.scenechose);
+                SceneChose4.setBackgroundResource(R.drawable.scenechose);
+                SceneChose2.setBackgroundResource(R.drawable.scenechose2);
+                choses = 2;
+                break;
+            case R.id.third_button:
+                SceneChose1.setBackgroundResource(R.drawable.scenechose);
+                SceneChose2.setBackgroundResource(R.drawable.scenechose);
+                SceneChose4.setBackgroundResource(R.drawable.scenechose);
+                SceneChose3.setBackgroundResource(R.drawable.scenechose2);
+                choses = 3;
+                break;
+            case R.id.fourth_button:
+                SceneChose1.setBackgroundResource(R.drawable.scenechose);
+                SceneChose2.setBackgroundResource(R.drawable.scenechose);
+                SceneChose3.setBackgroundResource(R.drawable.scenechose);
+                SceneChose4.setBackgroundResource(R.drawable.scenechose2);
+                choses = 4;
+                break;
+            case R.id.startLearn:
+                Intent intent = new Intent(LBSActivity.this, LearnActivity.class);
+                if (choses == 1) {
+                    intent.putExtra("SceneName", SceneChose1.getText());
+                    startActivity(intent);
+                } else if (choses == 2) {
+                    intent.putExtra("SceneName", SceneChose2.getText());
+                    startActivity(intent);
+                } else if (choses == 3) {
+                    intent.putExtra("SceneName", SceneChose3.getText());
+                    startActivity(intent);
+                } else if (choses == 4) {
+                    intent.putExtra("SceneName", SceneChose4.getText());
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(LBSActivity.this, "请先选择场景", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
     }
 
+
+    private void navigateTo(BDLocation location) {
+        if (isFirstLoc) {
+            LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
+            MapStatusUpdate update = MapStatusUpdateFactory.zoomTo(20f);
+            mBaiduMap.animateMapStatus(update);
+            update = MapStatusUpdateFactory.newLatLng(point);
+            mBaiduMap.animateMapStatus(update);
+            isFirstLoc = false;
+
+        }
+    }
+
+    private int[] getRandom(int Range,int Number){
+        int[] Random = new int[Number];
+        int i = 0;
+        while (i < Number) {
+            int d = 0;
+            double b;
+            b = Math.random() * Range;
+            int c = (int) b;
+            for(int j=0;j<i;j++) {
+                if (Random[j] == c) {
+                    d = 1;
+                }
+            }
+            if (d == 0) {
+                Random[i] = c;
+                i++;
+            }
+        }
+        return Random;
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
+        //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
+        mMapView.onDestroy();
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
+        mMapView.onResume();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
+        mMapView.onPause();
+    }
 }
+
