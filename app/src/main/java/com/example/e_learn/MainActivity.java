@@ -1,19 +1,15 @@
 package com.example.e_learn;
 
-import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -26,9 +22,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
 
-import java.util.ArrayList;
 import java.util.List;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private Button company;
     private StringBuffer sb;
 
-
+    public LocationClient mLocationClient = null;
+    public BDLocationListener myListener = new MyLocationListener();
 
     class MainMenuClick implements View.OnClickListener {
 
@@ -57,6 +52,10 @@ public class MainActivity extends AppCompatActivity {
                     video.setBackgroundResource(R.drawable.vedio_1);
                     company.setBackgroundResource(R.drawable.company_1);
                     home.setBackgroundResource(R.drawable.home_2);
+                    break;
+                case R.id.map:
+                    Intent intent = new Intent(MainActivity.this, LBSActivity.class);
+                    startActivity(intent);
                     break;
                 case R.id.scene:
                     home.setBackgroundResource(R.drawable.home_1);
@@ -85,19 +84,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle saveInstanceState) {
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        super.onCreate(savedInstanceState);
+        super.onCreate(saveInstanceState);
         setContentView(R.layout.activity_main);
+
+
         mLocationClient = new LocationClient(getApplicationContext());
         //声明LocationClient类
 
 
 
 
-        List<String> permissionList = new ArrayList<>();
+        /*List<String> permissionList = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -110,10 +110,9 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         } else {
+        }*/
 
-
-        }
-        mLocationClient.registerLocationListener( myListener );
+        mLocationClient.registerLocationListener(myListener);
         initLocation();
         mLocationClient.start();
 
@@ -133,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         button1.getBackground().setAlpha(125);
         Button button2 = (Button) findViewById(R.id.button_review);
         button2.getBackground().setAlpha(125);
-        button1.setOnClickListener(new View.OnClickListener(){
+        button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
             }
@@ -156,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         navView.setCheckedItem(R.id.message);
-        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 drawerLayout.closeDrawers();
@@ -174,7 +173,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-}
+
+
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -185,7 +185,8 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
-    private void initLocation(){
+
+    private void initLocation() {
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         //可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
@@ -193,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
         option.setCoorType("bd09ll");
         //可选，默认gcj02，设置返回的定位结果坐标系
 
-        int span=0;
+        int span = 0;
         option.setScanSpan(span);
         //可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
 
@@ -225,9 +226,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
-    public void onRequestPermissionsResult(int requestCode,String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case 1:
                 if (grantResults.length > 0) {
@@ -244,6 +244,113 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             default:
+        }
+    }
+    
+    public class MyLocationListener implements BDLocationListener {
+
+        @Override
+        public void onConnectHotSpotMessage(String s, int i) {
+
+        }
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+
+            //获取定位结果
+            sb = new StringBuffer(256);
+            StringBuffer k1 = new StringBuffer(256);
+            StringBuffer k2 = new StringBuffer(256);
+
+            sb.append("time : ");
+            sb.append(location.getTime());    //获取定位时间
+
+            sb.append("\nerror code : ");
+            sb.append(location.getLocType());    //获取类型类型
+
+            sb.append("\nlatitude : ");
+            sb.append(location.getLatitude());
+            k1.append(location.getLatitude());
+            //获取纬度信息
+
+            sb.append("\nlontitude : ");
+            sb.append(location.getLongitude());
+            k2.append(location.getLongitude());
+            //获取经度信息
+
+            sb.append("\nradius : ");
+            sb.append(location.getRadius());    //获取定位精准度
+
+            if (location.getLocType() == BDLocation.TypeGpsLocation) {
+
+                // GPS定位结果
+                sb.append("\nspeed : ");
+                sb.append(location.getSpeed());    // 单位：公里每小时
+
+                sb.append("\nsatellite : ");
+                sb.append(location.getSatelliteNumber());    //获取卫星数
+
+                sb.append("\nheight : ");
+                sb.append(location.getAltitude());    //获取海拔高度信息，单位米
+
+                sb.append("\ndirection : ");
+                sb.append(location.getDirection());    //获取方向信息，单位度
+
+                sb.append("\naddr : ");
+                sb.append(location.getAddrStr());    //获取地址信息
+
+                sb.append("\ndescribe : ");
+                sb.append("gps定位成功");
+
+            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {
+
+                // 网络定位结果
+                sb.append("\naddr : ");
+                sb.append(location.getAddrStr());    //获取地址信息
+
+                sb.append("\noperationers : ");
+                sb.append(location.getOperators());    //获取运营商信息
+
+                sb.append("\ndescribe : ");
+                sb.append("网络定位成功");
+
+            } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {
+
+                // 离线定位结果
+                sb.append("\ndescribe : ");
+                sb.append("离线定位成功，离线定位结果也是有效的");
+
+            } else if (location.getLocType() == BDLocation.TypeServerError) {
+
+                sb.append("\ndescribe : ");
+                sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
+
+            } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
+
+                sb.append("\ndescribe : ");
+                sb.append("网络不同导致定位失败，请检查网络是否通畅");
+
+            } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
+
+                sb.append("\ndescribe : ");
+                sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
+
+            }
+
+            sb.append("\nlocationdescribe : ");
+            sb.append(location.getLocationDescribe());    //位置语义化信息
+
+            List<Poi> list = location.getPoiList();    // POI数据
+            if (list != null) {
+                sb.append("\npoilist size = : ");
+                sb.append(list.size());
+                for (Poi p : list) {
+                    sb.append("\npoi= : ");
+                    sb.append(p.getId() + " " + p.getName() + " " + p.getRank());
+                }
+            }
+
+            Log.i("BaiduLocationApiDem", sb.toString());
         }
     }
 }
