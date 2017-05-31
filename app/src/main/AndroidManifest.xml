@@ -39,7 +39,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+    <activity android:name=".LBSActivity" />
+    <activity android:name=".DatabasesTest" />
+    <activity android:name=".LearnActivity"/>
     </application>
 
 </manifest>
