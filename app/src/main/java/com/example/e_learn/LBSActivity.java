@@ -399,5 +399,5 @@ public class LBSActivity extends AppCompatActivity implements View.OnClickListen
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mMapView.onPause();
     }
- }
+  }
 
